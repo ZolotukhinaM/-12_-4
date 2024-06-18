@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ЛР12_Часть4
 {
-    public class PointHashTable<T>
+    public class PointHashTable<T> // HT<T>
     {
         public T? key;//ключ
         public T? value;//значение

@@ -9,9 +9,9 @@ namespace ЛР12_Часть4
 {
     public class HashTable<T> : ICollection<T>, IEnumerable<T> where T : IComparable, ICloneable
     {
-        private PointHashTable<T>[]? table;
+        protected PointHashTable<T>[]? table;
         public PointHashTable<T>[]? Table => table;
-        private int Capacity;
+        public int Capacity;
         public int Count { get; private set; }
 
         public bool IsReadOnly => false;
@@ -40,7 +40,9 @@ namespace ЛР12_Часть4
             Capacity = t.Capacity;
         }
 
+
         //нумератор
+
         public IEnumerator<T> GetEnumerator()
         {
             for (int i = 0; i < Capacity; i++)
@@ -57,13 +59,14 @@ namespace ЛР12_Часть4
             }
         }
 
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             throw new NotImplementedException();
         }
 
         //добавление элемента
-        public void Add(T item)
+        public virtual void Add(T item)
         {
             PointHashTable<T> point = new PointHashTable<T>(item);
             if (item == null) return;
@@ -88,31 +91,35 @@ namespace ЛР12_Часть4
             }
             return;
         }
+
         //индексатор для получения элемента по ключу
-        public T this[T key]
+        public virtual T this[int index]
         {
-            get
+            set
             {
-                if (key == null)
-                    throw new ArgumentNullException("Ключ не может быть равен null");
-
-                PointHashTable<T> point = new PointHashTable<T>(key);
-
-                int index = point.GetHashCode() % Capacity;
-                if (!this.Contains(key))
+                if (index >= 0 && index < Capacity && value != null) // проверка типа
                 {
-                    throw new Exception("Искомого элемента нет в таблице");
+                    if (table[index] != null)
+                    {
+                        table[index].value = value;
+                        table[index].key = value;
+                    }
+                    else
+                    {
+                        PointHashTable<T> node = new PointHashTable<T>(value);
+                        table[index] = node;
+                    }
                 }
-
-                PointHashTable<T> current = table[index];
-                while (current.key.ToString() != key.ToString())
+                else
                 {
-                    current = current.next;
+                    if (value == null)
+                        throw new ArgumentNullException("Значение не может быть равно null");
+                    if (index < 0 || index >= Capacity)
+                        throw new IndexOutOfRangeException("Вы вышли за пределы диапазона");
                 }
-                return current.value;
             }
+
         }
-        //добавление элементов
         public void Add(params T[] mas)
         {
             foreach (T item in mas)
@@ -173,12 +180,13 @@ namespace ЛР12_Часть4
             throw new NotImplementedException();
         }
 
+        //копирование коллекции
         public HashTable<T> CopyFrom(HashTable<T> t)
         {
             return t;
         }
         //удаление элемента
-        public bool Remove(T item)
+        public virtual bool Remove(T item)
         {
             PointHashTable<T> lp = new PointHashTable<T>(item);
             int code = lp.GetHashCode() % Capacity;
@@ -219,5 +227,8 @@ namespace ЛР12_Часть4
             return false;
         }
     }
-
 }
+
+
+
+
